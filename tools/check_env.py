@@ -16,10 +16,10 @@ CORE = [
     ("numpy", "1.26"),
     ("pandas", "2.1"),
     ("scipy", "1.11"),
-    ("sklearn", "1.4"),
+    ("sklearn", "1.9"),
     ("matplotlib", "3.8"),
 ]
-LATER = ["seaborn", "catboost", "lightgbm", "optuna", "datasketch"]
+LATER = ["seaborn", "data_profiling", "nltk", "pymorphy3", "catboost", "lightgbm", "optuna", "datasketch"]
 
 #: Подсказки для известных поломок, которые не лечатся переустановкой пакета.
 HINTS = {
@@ -61,8 +61,8 @@ def as_tuple(v: str) -> tuple:
 
 def main() -> int:
     print(f"python {platform.python_version()}  ({sys.executable})")
-    if sys.version_info < (3, 10):
-        print("  ! нужен python 3.10 или новее")
+    if not (3, 11) <= sys.version_info[:2] <= (3, 13):
+        print("  ! нужен python от 3.11 до 3.13")
 
     problems = 0
     print("\nобязательные пакеты:")

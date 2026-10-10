@@ -19,7 +19,7 @@ CORE = [
     ("sklearn", "1.9"),
     ("matplotlib", "3.8"),
 ]
-LATER = ["seaborn", "data_profiling", "nltk", "pymorphy3", "catboost", "lightgbm", "optuna", "datasketch"]
+LATER = ["seaborn", "data_profiling", "nltk", "pymorphy3", "catboost", "lightgbm", "optuna", "datasketch", "umap", "plotly"]
 
 #: Подсказки для известных поломок, которые не лечатся переустановкой пакета.
 HINTS = {

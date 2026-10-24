@@ -16,6 +16,7 @@ mlruns/
 wandb/
 *.ckpt
 *.pt
+homeworks/
 
 # решенные версии выкладываются после занятия, отдельным коммитом
 classes/**/*_solved.ipynb

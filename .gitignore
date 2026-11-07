@@ -25,3 +25,6 @@ classes/**/artifacts/
 
 # исходники слайдов не публикуются, только pdf
 classes/**/*.pptx
+
+
+homeworks/

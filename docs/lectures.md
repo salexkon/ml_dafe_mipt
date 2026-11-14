@@ -24,11 +24,25 @@
 | 8 | Intro to Deep Learning | 10 | [wgWfAMhw5ik](https://www.youtube.com/watch?v=wgWfAMhw5ik&list=PL4_hYwCyhAvZyW6qS58x4uElZgAkMVUvj) |
 | 9 | Optimization and regularization in Deep Learning | 12 | [XWAvufvzk2M](https://www.youtube.com/watch?v=XWAvufvzk2M&list=PL4_hYwCyhAvZyW6qS58x4uElZgAkMVUvj) |
 | 10 | Recurrent Neural Networks and Language Models | по желанию | [TkFBozjO72Y](https://www.youtube.com/watch?v=TkFBozjO72Y&list=PL4_hYwCyhAvZyW6qS58x4uElZgAkMVUvj) |
-| 11 | Convolutional neural networks | 13 | [6_vFNBwfK28](https://www.youtube.com/watch?v=6_vFNBwfK28&list=PL4_hYwCyhAvZyW6qS58x4uElZgAkMVUvj) |
+| 11 | Convolutional neural networks | 11; повтор к 13 | [6_vFNBwfK28](https://www.youtube.com/watch?v=6_vFNBwfK28&list=PL4_hYwCyhAvZyW6qS58x4uElZgAkMVUvj) |
 
 Занятия 10–13 — введение в нейронные сети. Лекция 10 про рекуррентные сети
-оставлена для тех, кому интересно посмотреть самостоятельно; к занятию 11
-про PyTorch видео нет.
+оставлена для тех, кому интересно посмотреть самостоятельно.
+К занятию 11 подготовлена [теория сверток, pooling, оптимизации и аугментаций](../classes/week_11_convolutions/lecture_11.ipynb).
+Переход с NumPy на PyTorch и эксперименты на CIFAR-10 разбираются
+в [семинаре 11](../classes/week_11_convolutions/seminar_11.ipynb).
+В лекции рассмотрены BatchNorm и границы областей AdaptiveAvgPool.
+Подробные примеры pooling, его стоимость, расстояние между центрами полей восприятия,
+LayerNorm и GroupNorm собраны в
+[конспекте о слоях](../classes/week_11_convolutions/notes_11_layers.ipynb). В семинаре сравнивают resize входа,
+усреднение входа и усреднение карт признаков на изображениях разных размеров.
+MaxPool и AvgPool проверяют на настоящем изображении CIFAR-10 и увеличенном окне одного канала.
+В [лабораторной 11](../classes/week_11_convolutions/lab_11.ipynb) реализуют NumPy-свёртку с тремя и двумя циклами,
+собственные MaxPool2d, Dropout и BatchNorm2d с режимами train/eval, затем CNN для CIFAR-10.
+Девять обязательных задач дают 10 баллов; бонусы — свёртка с одним циклом и без циклов.
+Каждый бонус даёт +1 балл при общем потолке оценки 11. Качество, скорость и устойчивость сравнивают в одном протоколе.
+Матричная запись свертки, im2col и вывод градиентов собраны
+в [дополнительном конспекте](../classes/week_11_convolutions/notes_11_convolution_matrix.ipynb).
 
 Занятие 14 про устройство ML-проекта идет без видео: к нему в репозитории
 будет короткий текст, ссылка появится в расписании перед занятием.
@@ -53,3 +67,25 @@
 
 Еще одна серия того же уровня — [«Тренировки по ML»](https://youtu.be/k3UJOG-DKHE)
 Яндекса: тот же материал другими словами, полезно, если что-то не улеглось.
+
+## Оптимизаторы: дополнительная лекция к занятиям 11–12
+
+[«Машинное обучение 10. Нейросети, часть 2»](https://www.youtube.com/watch?v=oMrUaNQC3po)
+Радослава Нейчева, 16 апреля 2019 года: SGD и momentum — примерно с 04:00,
+Нестеров — с 07:50, AdaGrad — с 13:50, RMSprop — с 16:00, Adam — с 18:30.
+Времена ориентировочные. Последующие разделы видео посвящены нормализации,
+регуляризации и аугментациям.
+
+В [лекции 11](../classes/week_11_convolutions/lecture_11.ipynb), раздел 8,
+оставлен один виджет с 3D-траекториями девяти оптимизаторов на четырёх поверхностях.
+Методы можно включать отдельно, поверхности - вращать мышью.
+Формулы, механизмы обновлений и сравнение памяти вынесены в конспект. Подробный разбор с формулами,
+кодом и графиками находится в [конспекте оптимизаторов](../classes/week_11_convolutions/notes_11_optimizers.ipynb):
+AdamW, Adafactor, Lion, Muon/MuonClip, Shampoo/SOAP и экономия памяти состояний.
+Видеолекция 2019 года не является источником утверждений о распространенности
+методов в 2026 году: для современного обзора в ноутбуке указаны отдельные первичные источники.
+
+В конспекте дополнительное сравнение десяти конфигураций CNN на CIFAR-10 включается
+переменной `W11_OPT_CIFAR=1` до запуска ядра. Каждый метод получает три кандидата
+шага на одном разбиении; выбор выполняется по validation, итоговый отчет — на test.
+По умолчанию этот тяжелый опыт выключен, математические демонстрации выполняются всегда.

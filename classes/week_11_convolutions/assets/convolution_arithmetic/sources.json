@@ -1,0 +1,15 @@
+{
+  "authors": [
+    "Vincent Dumoulin",
+    "Francesco Visin"
+  ],
+  "repository": "https://github.com/vdumoulin/conv_arithmetic",
+  "commit": "af6f818b0bb396c26da79899554682a8a499101d",
+  "license": "MIT",
+  "files": {
+    "no_padding_no_strides.gif": "https://raw.githubusercontent.com/vdumoulin/conv_arithmetic/af6f818b0bb396c26da79899554682a8a499101d/gif/no_padding_no_strides.gif",
+    "same_padding_no_strides.gif": "https://raw.githubusercontent.com/vdumoulin/conv_arithmetic/af6f818b0bb396c26da79899554682a8a499101d/gif/same_padding_no_strides.gif",
+    "padding_strides.gif": "https://raw.githubusercontent.com/vdumoulin/conv_arithmetic/af6f818b0bb396c26da79899554682a8a499101d/gif/padding_strides.gif",
+    "dilation.gif": "https://raw.githubusercontent.com/vdumoulin/conv_arithmetic/af6f818b0bb396c26da79899554682a8a499101d/gif/dilation.gif"
+  }
+}

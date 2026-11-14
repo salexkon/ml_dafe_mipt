@@ -1,0 +1,35 @@
+{
+  "dropout_fig1.png": {
+    "authors": "Nitish Srivastava et al.",
+    "title": "Dropout, Fig. 1",
+    "year": 2014,
+    "url": "https://jmlr.org/papers/v15/srivastava14a.html",
+    "pdf": "https://jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf",
+    "page": 2
+  },
+  "group_norm_axes.svg": {
+    "authors": "Yuxin Wu, Kaiming He",
+    "title": "Group Normalization: Group Norm illustration",
+    "year": 2018,
+    "url": "https://ppwwyyxx.com/publication/group-norm/",
+    "asset": "https://ppwwyyxx.com/publication/group-norm/featured.svg"
+  },
+  "group_norm_axes.png": {
+    "derived_from": "group_norm_axes.svg",
+    "conversion": "Rasterized on white background."
+  },
+  "batch_norm_axes.png": {
+    "authors": "Yuxin Wu, Kaiming He",
+    "title": "Group Normalization, Figure 2: Batch Norm panel",
+    "year": 2018,
+    "url": "https://arxiv.org/abs/1803.08494",
+    "pdf": "https://arxiv.org/pdf/1803.08494",
+    "page": 3,
+    "crop_points": [
+      112,
+      66,
+      204,
+      168
+    ]
+  }
+}

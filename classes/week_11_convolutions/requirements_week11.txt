@@ -1,0 +1,8 @@
+# Дополнение к requirements.txt курса; Python 3.11.
+# Проверено совместно на macOS arm64 / MPS 13 ноября 2026.
+# Для CUDA torch/torchvision устанавливают под свою версию драйвера
+# по инструкции pytorch.org; пару версий этих пакетов сохраняют согласованной.
+torch==2.15.0
+torchvision==0.29.2
+albumentations==2.0.8
+opencv-python-headless==4.14.0.94

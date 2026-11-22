@@ -640,32 +640,36 @@ def plot_resolution_examples(variants):
 
 def plot_bn_batch_effect(batch_a, batch_b, train_outputs, eval_outputs, *,
                          gamma, beta, running_mean, running_variance, momentum=.25, eps=1e-5):
-    """Полные входы/выходы и все подстановки для первого объекта, канала 0."""
+    """Два независимых слоя: один обучающий батч, затем eval каждого слоя."""
+    from fractions import Fraction
     from matplotlib.colors import TwoSlopeNorm
     from matplotlib.patches import Rectangle
 
-    batches = [np.asarray(batch_a), np.asarray(batch_b)]
+    batches = np.stack([batch_a, batch_b])
     train_outputs, eval_outputs = np.asarray(train_outputs), np.asarray(eval_outputs)
     gamma, beta = np.asarray(gamma), np.asarray(beta)
     running_mean, running_variance = np.asarray(running_mean), np.asarray(running_variance)
-    assert batches[0].shape == batches[1].shape == (4, 2)
-    assert train_outputs.shape == eval_outputs.shape == (2, 4, 2)
+    assert batches.shape == train_outputs.shape == eval_outputs.shape == (2, 4, 2)
+    assert running_mean.shape == running_variance.shape == (2, 2)
     for index, values in enumerate(batches):
         expected = gamma * (values - values.mean(axis=0)) / np.sqrt(values.var(axis=0) + eps) + beta
         assert np.allclose(train_outputs[index], expected, atol=1e-6)
-        expected_eval = gamma * (values - running_mean) / np.sqrt(running_variance + eps) + beta
+        expected_eval = gamma * (values - running_mean[index]) / np.sqrt(running_variance[index] + eps) + beta
         assert np.allclose(eval_outputs[index], expected_eval, atol=1e-6)
-    mean_a = batches[0].mean(axis=0)
-    unbiased_a = batches[0].var(axis=0, ddof=1)
-    assert np.allclose(running_mean, momentum * mean_a)
-    assert np.allclose(running_variance, (1 - momentum) + momentum * unbiased_a)
+        assert np.allclose(running_mean[index], momentum * values.mean(axis=0))
+        assert np.allclose(running_variance[index], (1 - momentum) + momentum * values.var(axis=0, ddof=1))
 
-    all_values = np.concatenate([a.ravel() for a in batches] + [train_outputs.ravel(), eval_outputs.ravel()])
+    def fraction(value):
+        number = Fraction(float(value)).limit_denominator(10000)
+        result = str(number.numerator) if number.denominator == 1 else rf'\frac{{{number.numerator}}}{{{number.denominator}}}'
+        return result
+
+    all_values = np.concatenate([batches.ravel(), train_outputs.ravel(), eval_outputs.ravel()])
     norm = TwoSlopeNorm(vmin=min(float(all_values.min()), -.1), vcenter=0, vmax=float(all_values.max()))
     palette = plt.get_cmap('coolwarm')
     gold = '#c19022'
-    figure = plt.figure(figsize=(19, 13.5), layout='constrained')
-    grid = figure.add_gridspec(3, 2, height_ratios=[1.25, .9, 1.65], hspace=.12, wspace=.08)
+    figure = plt.figure(figsize=(19, 18), layout='constrained')
+    grid = figure.add_gridspec(4, 2, height_ratios=[1.3, .75, .95, 1.3], hspace=.09, wspace=.08)
 
     def matrix(axis, values, left, title):
         axis.imshow(values, cmap=palette, norm=norm, origin='upper', interpolation='nearest',
@@ -687,51 +691,59 @@ def plot_bn_batch_effect(batch_a, batch_b, train_outputs, eval_outputs, *,
         for row in range(4):
             axis.text(left - .18, 3.5 - row, f'n={row}', ha='right', va='center', fontsize=10)
 
+
     for index, name in enumerate(['A', 'B']):
         axis = figure.add_subplot(grid[0, index])
-        axis.set(xlim=(-.8, 6.8), ylim=(-.9, 5.7), aspect='equal')
+        axis.set(xlim=(-.8, 7.2), ylim=(-.9, 5.7), aspect='equal')
         axis.axis('off')
         matrix(axis, batches[index], 0, f'Вход X_{name}')
-        matrix(axis, train_outputs[index], 4.2, f'Выход train Y_{name}')
+        matrix(axis, train_outputs[index], 4.2, f'Слой {name}: выход train')
         axis.annotate('', (3.7, 2), (2.35, 2), arrowprops={'arrowstyle': '->', 'lw': 1.7, 'color': INK})
 
-        calc = figure.add_subplot(grid[1, index])
-        calc.set(xlim=(0, 1), ylim=(0, 1)); calc.axis('off')
-        values = batches[index][:, 0]
+        values = batches[index, :, 0]
         mean, variance = values.mean(), values.var()
         deviations = values - mean
         mean_sum = '+'.join(f'{v:g}' for v in values)
         squares = '+'.join(f'{v*v:g}' for v in deviations)
-        calc.text(.02, .96, f'Расчёт для c=0, батч {name}', weight='bold', fontsize=15, va='top')
-        lines = [rf'$\mu_{name}=({mean_sum})/4={mean:g}$',
-                 rf'$v_{name}=[\sum_i(x_i-\mu_{name})^2]/4=({squares})/4={variance:g}$',
+        calc = figure.add_subplot(grid[1, index])
+        calc.set(xlim=(0, 1), ylim=(0, 1))
+        calc.axis('off')
+        calc.text(.02, .98, f'Батч {name}, канал c=0: статистики train', weight='bold', fontsize=15, va='top')
+        lines = [rf'$\mu_{{{name},0}}=({mean_sum})/4={mean:g}$',
+                 rf'$v_{{{name},0}}=({squares})/4={variance:g}$',
                  rf'$y^{{train}}_{name}[0,0]={gamma[0]:g}\cdot\frac{{{values[0]:g}-{mean:g}}}{{\sqrt{{{variance:g}+\varepsilon}}}}+{beta[0]:g}={train_outputs[index,0,0]:.4f}$']
-        for y, line in zip([.69, .43, .14], lines):
+        for y, line in zip([.70, .43, .12], lines):
             calc.text(.02, y, line, fontsize=15, va='center')
 
-    running = figure.add_subplot(grid[2, 0])
-    running.set(xlim=(0, 1), ylim=(0, 1)); running.axis('off')
-    running.text(.02, .98, 'Откуда взялись сохранённые статистики', fontsize=15, weight='bold', va='top')
-    running.text(.02, .85, 'Исходный слой: один train-проход батча A, momentum=0.25.\nДо него running_mean=[0,0], running_var=[1,1].', fontsize=12, linespacing=1.5, va='top')
-    running_lines = [r'$\mu_{run,0}=0.75\cdot0+0.25\cdot4=1$',
-                     r'$s^2_{A,0}=(9+1+1+9)/(4-1)=20/3$',
-                     r'$v_{run,0}=0.75\cdot1+0.25\cdot(20/3)=29/12\approx2.4167$',
-                     r'$\mu_{A,1}=(10+14+18+22)/4=16$',
-                     r'$s^2_{A,1}=(36+4+4+36)/(4-1)=80/3$',
-                     r'$\mu_{run,1}=0.75\cdot0+0.25\cdot16=4$',
-                     r'$v_{run,1}=0.75\cdot1+0.25\cdot(80/3)=89/12\approx7.4167$']
-    for y, line in zip(np.linspace(.64, .06, len(running_lines)), running_lines):
-        running.text(.02, y, line, fontsize=14, va='center')
+        running = figure.add_subplot(grid[2, index])
+        running.set(xlim=(0, 1), ylim=(0, 1))
+        running.axis('off')
+        running.text(.02, .98, f'Слой {name}: сохранённые статистики c=0', fontsize=15, weight='bold', va='top')
+        running.text(.02, .79, 'До train: running_mean=0, running_var=1; один проход.', fontsize=12)
+        unbiased = fraction(values.var(ddof=1))
+        run_variance = fraction(running_variance[index, 0])
+        running_lines = [
+            rf'$\mu_{{run,{name},0}}={1-momentum:g}\cdot0+{momentum:g}\cdot{mean:g}={running_mean[index,0]:g}$',
+            rf'$s^2_{{{name},0}}=({squares})/(4-1)={unbiased}$',
+            rf'$v_{{run,{name},0}}={1-momentum:g}\cdot1+{momentum:g}\cdot({unbiased})={run_variance}\approx{running_variance[index,0]:.4f}$',
+        ]
+        for y, line in zip([.58, .36, .11], running_lines):
+            running.text(.02, y, line, fontsize=15, va='center')
 
-    evaluation = figure.add_subplot(grid[2, 1])
-    evaluation.set(xlim=(-.8, 6.8), ylim=(-3.0, 5.7), aspect='equal'); evaluation.axis('off')
-    matrix(evaluation, eval_outputs[0], 0, 'Выход eval\nбатч A')
-    matrix(evaluation, eval_outputs[1], 4.2, 'Выход eval\nбатч B')
-    evaluation.text(3, -1.25, r'$y^{eval}_A[0,0]=2\cdot\frac{1-1}{\sqrt{29/12+\varepsilon}}+0.5=0.5$', ha='center', fontsize=14)
-    evaluation.text(3, -2.15, r'$y^{eval}_B[0,0]=2\cdot\frac{1-1}{\sqrt{29/12+\varepsilon}}+0.5=0.5$', ha='center', fontsize=14)
-    figure.suptitle('BatchNorm: одинаковые формы входа и выхода, 4x2\n'
-                   'Строки - объекты, столбцы - каналы. Золотая рамка: элемент [0,0].\n'
-                   'train A и B: независимые копии; eval: исходный слой после одного батча A.\n'
-                   'gamma=[2, 0.5], beta=[0.5, -1], eps=0.00001', fontsize=15, weight='bold')
+        evaluation = figure.add_subplot(grid[3, index])
+        evaluation.set(xlim=(-.8, 7.2), ylim=(-.9, 5.7), aspect='equal')
+        evaluation.axis('off')
+        matrix(evaluation, eval_outputs[index], 0, f'Слой {name}: выход eval')
+        evaluation.text(2.8, 3.6, f'Статистики после {name} заморожены.', fontsize=12)
+        evaluation.text(2.8, 2.6, rf'$y^{{eval}}_{name}[0,0]={gamma[0]:g}\cdot\frac{{{values[0]:g}-{running_mean[index,0]:g}}}{{\sqrt{{{run_variance}+\varepsilon}}}}+{beta[0]:g}$', fontsize=15)
+        evaluation.text(2.8, 1.4, rf'$={eval_outputs[index,0,0]:.4f}$', fontsize=18, weight='bold')
+
+    figure.suptitle('BatchNorm: два независимых слоя с одинаковыми gamma и beta\n'
+                   'Слой A: train на A, затем eval на A. Слой B: train на B, затем eval на B.\n'
+                   'Строки - объекты, столбцы - каналы; золотая рамка - [0,0].\n'
+                   'gamma=[2, 0.5], beta=[0.5, -1], momentum=0.25, eps=0.00001', fontsize=15, weight='bold')
+    figure.supxlabel('Разные ответы eval здесь вызваны разными обученными статистиками двух слоёв.\n'
+                     'У одного фиксированного слоя A первый выход равен 0.5 и для A, и для B: состав тестового батча его не меняет.',
+                     fontsize=12)
     plt.show()
     return figure

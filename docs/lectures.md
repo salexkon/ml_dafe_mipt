@@ -22,7 +22,7 @@
 | 6 | Decision trees and Ensembles | 8 | [-0Do2_WIJAQ](https://www.youtube.com/watch?v=-0Do2_WIJAQ&list=PL4_hYwCyhAvZyW6qS58x4uElZgAkMVUvj) |
 | 7 | Gradient boosting | 9 | [hTECDpL_JYM](https://www.youtube.com/watch?v=hTECDpL_JYM&list=PL4_hYwCyhAvZyW6qS58x4uElZgAkMVUvj) |
 | 8 | Intro to Deep Learning | 10 | [wgWfAMhw5ik](https://www.youtube.com/watch?v=wgWfAMhw5ik&list=PL4_hYwCyhAvZyW6qS58x4uElZgAkMVUvj) |
-| 9 | Optimization and regularization in Deep Learning | 12 | [XWAvufvzk2M](https://www.youtube.com/watch?v=XWAvufvzk2M&list=PL4_hYwCyhAvZyW6qS58x4uElZgAkMVUvj) |
+| 9 | Optimization and regularization in Deep Learning | 11–12, дополнительно | [XWAvufvzk2M](https://www.youtube.com/watch?v=XWAvufvzk2M&list=PL4_hYwCyhAvZyW6qS58x4uElZgAkMVUvj) |
 | 10 | Recurrent Neural Networks and Language Models | по желанию | [TkFBozjO72Y](https://www.youtube.com/watch?v=TkFBozjO72Y&list=PL4_hYwCyhAvZyW6qS58x4uElZgAkMVUvj) |
 | 11 | Convolutional neural networks | 11; повтор к 13 | [6_vFNBwfK28](https://www.youtube.com/watch?v=6_vFNBwfK28&list=PL4_hYwCyhAvZyW6qS58x4uElZgAkMVUvj) |
 
@@ -43,6 +43,13 @@ MaxPool и AvgPool проверяют на настоящем изображен
 Каждый бонус даёт +1 балл при общем потолке оценки 11. Качество, скорость и устойчивость сравнивают в одном протоколе.
 Матричная запись свертки, im2col и вывод градиентов собраны
 в [дополнительном конспекте](../classes/week_11_convolutions/notes_11_convolution_matrix.ipynb).
+
+К занятию 12 подготовлен [семинар по основам PyTorch](../classes/week_12_pytorch/seminar_12.ipynb).
+Тензоры и сравнение с NumPy, перестановка осей картинки, перенос на CPU/CUDA/MPS,
+Dataset и DataLoader, собственный Module и один шаг обучения разбираются маленькими ячейками.
+Реальный граф autograd показан до и после backward, производные сверены вручную.
+Отдельно рассмотрены train/eval, отключение градиентов, сохранение весов и tqdm.
+В конце кратко сопоставлены PyTorch, TensorFlow и JAX; установка двух последних не требуется.
 
 Занятие 14 про устройство ML-проекта идет без видео: к нему в репозитории
 будет короткий текст, ссылка появится в расписании перед занятием.
